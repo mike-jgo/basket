@@ -15,7 +15,7 @@ defineEmits(['toggle', 'remove'])
       {{ item.name }}
     </span>
     <span v-if="item.price" :class="item.checked ? 'text-gray-300' : 'text-gray-500'" class="text-sm">
-      ${{ item.price.toFixed(2) }}
+      ₱{{ item.price.toFixed(2) }}
     </span>
     <button @click="$emit('remove', item.id)" class="text-gray-300 hover:text-red-500">
       &times;
