@@ -176,8 +176,8 @@ const filteredSuggestions = computed(() => {
 
 const uncheckedItems = computed(() => items.value.filter((i) => !i.checked))
 const checkedItems = computed(() => items.value.filter((i) => i.checked))
-const total = computed(() => items.value.reduce((sum, i) => sum + (i.price ?? 0), 0))
-const checkedTotal = computed(() => checkedItems.value.reduce((sum, i) => sum + (i.price ?? 0), 0))
+const total = computed(() => Math.round(items.value.reduce((sum, i) => sum + (i.price ?? 0), 0) * 100) / 100)
+const checkedTotal = computed(() => Math.round(checkedItems.value.reduce((sum, i) => sum + (i.price ?? 0), 0) * 100) / 100)
 const hasAnyPrice = computed(() => items.value.some((i) => i.price > 0))
 
 const formatDate = (iso) =>
@@ -292,7 +292,7 @@ const listTotal = (list) => list.items.filter((i) => i.checked).reduce((sum, i) 
                   type="number"
                   min="0"
                   step="0.01"
-                  :value="item.price || ''"
+                  :value="item.price ? item.price.toFixed(2) : ''"
                   placeholder="0.00"
                   @change="updatePrice(item.id, parseFloat($event.target.value) || 0)"
                   class="w-24 rounded border border-gray-200 py-1 pl-5 pr-2 text-sm text-gray-700 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
@@ -350,9 +350,10 @@ const listTotal = (list) => list.items.filter((i) => i.checked).reduce((sum, i) 
             <input
               v-model="priceInput"
               type="number"
-              min="0"
+              min="0.01"
               step="0.01"
               placeholder="0.00"
+              required
               class="w-28 rounded-lg border border-gray-300 py-2 pl-7 pr-3 text-gray-900 placeholder-gray-400 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
             />
           </div>
@@ -380,6 +381,7 @@ const listTotal = (list) => list.items.filter((i) => i.checked).reduce((sum, i) 
               v-for="item in uncheckedItems"
               :key="item.id"
               :item="item"
+              :requirePrice="true"
               @toggle="toggleItem"
               @remove="removeItem"
               @updatePrice="updatePrice"
