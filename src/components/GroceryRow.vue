@@ -1,6 +1,6 @@
 <script setup>
 defineProps(['item'])
-defineEmits(['toggle', 'remove'])
+defineEmits(['toggle', 'remove', 'updatePrice'])
 </script>
 
 <template>
@@ -14,9 +14,22 @@ defineEmits(['toggle', 'remove'])
     <span class="flex-1" :class="item.checked ? 'text-gray-400 line-through' : 'text-gray-900'">
       {{ item.name }}
     </span>
-    <span v-if="item.price" :class="item.checked ? 'text-gray-300' : 'text-gray-500'" class="text-sm">
-      ₱{{ item.price.toFixed(2) }}
-    </span>
+    <div class="relative">
+      <span
+        class="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-xs"
+        :class="item.checked ? 'text-gray-300' : 'text-gray-400'"
+      >₱</span>
+      <input
+        type="number"
+        min="0"
+        step="0.01"
+        :value="item.price || ''"
+        placeholder="0.00"
+        @change="$emit('updatePrice', item.id, parseFloat($event.target.value) || 0)"
+        class="w-24 rounded border border-gray-200 py-1 pl-5 pr-2 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+        :class="item.checked ? 'text-gray-300' : 'text-gray-700'"
+      />
+    </div>
     <button @click="$emit('remove', item.id)" class="text-gray-300 hover:text-red-500">
       &times;
     </button>
