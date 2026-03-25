@@ -9,6 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.100.0",
+    "tslib": "^2.8.1",
     "vue": "^3.5.30"
   },
   "devDependencies": {
