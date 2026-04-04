@@ -200,7 +200,7 @@ const filteredSuggestions = computed(() => {
           type="number"
           min="0"
           step="any"
-          placeholder="Amount"
+          placeholder="0"
           class="w-20 border-none py-2 pl-3 pr-1 text-gray-900 placeholder-gray-400 focus:outline-none"
         />
         <select
