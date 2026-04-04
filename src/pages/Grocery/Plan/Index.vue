@@ -173,20 +173,20 @@ const filteredSuggestions = computed(() => {
       placeholder="Item name"
       class="w-full rounded-lg border border-gray-300 px-4 py-2 text-gray-900 placeholder-gray-400 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
     />
-    <div class="flex gap-2">
+    <div class="flex flex-wrap gap-2">
       <input
         v-model="brandInput"
         type="text"
         placeholder="Brand"
-        class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+        class="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500 sm:flex-1 sm:w-auto"
       />
       <input
         v-model="volumeInput"
         type="text"
         placeholder="Vol / Weight"
-        class="w-28 rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+        class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500 sm:flex-none sm:w-28"
       />
-      <div class="relative">
+      <div class="relative flex-1 sm:flex-none">
         <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">₱</span>
         <input
           v-model="priceInput"
@@ -194,12 +194,12 @@ const filteredSuggestions = computed(() => {
           min="0"
           step="0.01"
           placeholder="0.00"
-          class="w-28 rounded-lg border border-gray-300 py-2 pl-7 pr-3 text-gray-900 placeholder-gray-400 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+          class="w-full rounded-lg border border-gray-300 py-2 pl-7 pr-3 text-gray-900 placeholder-gray-400 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500 sm:w-28"
         />
       </div>
       <button
         type="submit"
-        class="rounded-lg bg-green-600 px-5 py-2 font-medium text-white hover:bg-green-700"
+        class="w-full rounded-lg bg-green-600 px-5 py-2 font-medium text-white hover:bg-green-700 sm:w-auto"
       >
         Add
       </button>
