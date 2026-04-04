@@ -12,9 +12,18 @@ defineEmits(['toggle', 'remove', 'updatePrice'])
       @change="$emit('toggle', item.id)"
       class="h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 disabled:cursor-not-allowed disabled:opacity-30"
     />
-    <span class="flex-1" :class="item.checked ? 'text-gray-400 line-through' : 'text-gray-900'">
-      {{ item.name }}
-    </span>
+    <div class="flex-1 min-w-0">
+      <span class="block" :class="item.checked ? 'text-gray-400 line-through' : 'text-gray-900'">
+        {{ item.name }}
+      </span>
+      <span
+        v-if="item.brand || item.volume"
+        class="block truncate text-xs"
+        :class="item.checked ? 'text-gray-300' : 'text-gray-400'"
+      >
+        {{ [item.brand, item.volume].filter(Boolean).join(' · ') }}
+      </span>
+    </div>
     <div class="relative">
       <span
         class="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-xs"
