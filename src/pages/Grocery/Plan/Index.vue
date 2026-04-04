@@ -16,7 +16,7 @@ const suggestions = ref([])
 const selectedStore = ref(null)
 const allStores = ref([])
 
-const UNITS = ['g', 'kg', 'ml', 'L', 'lb', 'oz', 'pcs']
+const UNITS = ['g', 'kg', 'ml', 'L', 'lb', 'oz']
 
 onMounted(async () => {
   await Promise.all([loadItems(), loadSuggestions()])

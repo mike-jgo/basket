@@ -19,7 +19,7 @@ const storeInput = ref('')
 const knownStores = ref([])
 const showStoreDropdown = ref(false)
 
-const UNITS = ['g', 'kg', 'ml', 'L', 'lb', 'oz', 'pcs']
+const UNITS = ['g', 'kg', 'ml', 'L', 'lb', 'oz']
 
 const volumeDisplay = (item) =>
   item.volume != null ? `${item.volume} ${item.volume_unit ?? ''}`.trim() : null
