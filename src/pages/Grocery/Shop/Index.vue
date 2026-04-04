@@ -9,13 +9,20 @@ const emit = defineEmits(['back-to-plan', 'trip-completed'])
 const items = ref([])
 const nameInput = ref('')
 const brandInput = ref('')
-const volumeInput = ref('')
+const volumeAmountInput = ref('')
+const volumeUnitInput = ref('g')
+const quantityInput = ref(1)
 const priceInput = ref('')
 const showConfirm = ref(false)
 
 const storeInput = ref('')
 const knownStores = ref([])
 const showStoreDropdown = ref(false)
+
+const UNITS = ['g', 'kg', 'ml', 'L', 'lb', 'oz', 'pcs']
+
+const volumeDisplay = (item) =>
+  item.volume != null ? `${item.volume} ${item.volume_unit ?? ''}`.trim() : null
 
 onMounted(async () => {
   await Promise.all([loadItems(), loadStore()])
@@ -83,7 +90,9 @@ const addItem = async () => {
       list_id: props.listId,
       name,
       brand: brandInput.value.trim() || null,
-      volume: volumeInput.value.trim() || null,
+      volume: volumeAmountInput.value ? parseFloat(volumeAmountInput.value) : null,
+      volume_unit: volumeAmountInput.value ? volumeUnitInput.value : null,
+      quantity: parseInt(quantityInput.value) || 1,
       price,
       checked: false,
     })
@@ -98,7 +107,9 @@ const addItem = async () => {
   items.value.push(data)
   nameInput.value = ''
   brandInput.value = ''
-  volumeInput.value = ''
+  volumeAmountInput.value = ''
+  volumeUnitInput.value = 'g'
+  quantityInput.value = 1
   priceInput.value = ''
 }
 
@@ -138,8 +149,8 @@ const confirmComplete = async () => {
 
 const uncheckedItems = computed(() => items.value.filter((i) => !i.checked))
 const checkedItems = computed(() => items.value.filter((i) => i.checked))
-const total = computed(() => Math.round(items.value.reduce((sum, i) => sum + (i.price ?? 0), 0) * 100) / 100)
-const checkedTotal = computed(() => Math.round(checkedItems.value.reduce((sum, i) => sum + (i.price ?? 0), 0) * 100) / 100)
+const total = computed(() => Math.round(items.value.reduce((sum, i) => sum + (i.price ?? 0) * (i.quantity ?? 1), 0) * 100) / 100)
+const checkedTotal = computed(() => Math.round(checkedItems.value.reduce((sum, i) => sum + (i.price ?? 0) * (i.quantity ?? 1), 0) * 100) / 100)
 const hasAnyPrice = computed(() => items.value.some((i) => i.price > 0))
 </script>
 
@@ -181,20 +192,40 @@ const hasAnyPrice = computed(() => items.value.some((i) => i.price > 0))
       placeholder="Forgot something?"
       class="w-full rounded-lg border border-gray-300 px-4 py-2 text-gray-900 placeholder-gray-400 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
     />
-    <div class="flex gap-2">
+    <div class="flex flex-wrap gap-2">
       <input
         v-model="brandInput"
         type="text"
         placeholder="Brand"
-        class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+        class="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500 sm:flex-1 sm:w-auto"
       />
-      <input
-        v-model="volumeInput"
-        type="text"
-        placeholder="Vol / Weight"
-        class="w-28 rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
-      />
-      <div class="relative">
+      <div class="flex shrink-0 overflow-hidden rounded-lg border border-gray-300 focus-within:border-green-500 focus-within:ring-1 focus-within:ring-green-500">
+        <input
+          v-model="volumeAmountInput"
+          type="number"
+          min="0"
+          step="any"
+          placeholder="Amount"
+          class="w-20 border-none py-2 pl-3 pr-1 text-gray-900 placeholder-gray-400 focus:outline-none"
+        />
+        <select
+          v-model="volumeUnitInput"
+          class="border-l border-gray-300 bg-gray-50 py-2 pl-2 pr-1 text-sm text-gray-700 focus:outline-none"
+        >
+          <option v-for="u in UNITS" :key="u" :value="u">{{ u }}</option>
+        </select>
+      </div>
+      <div class="flex shrink-0 overflow-hidden rounded-lg border border-gray-300 focus-within:border-green-500 focus-within:ring-1 focus-within:ring-green-500">
+        <span class="flex items-center pl-3 text-xs text-gray-400 select-none">qty</span>
+        <input
+          v-model="quantityInput"
+          type="number"
+          min="1"
+          step="1"
+          class="w-14 border-none py-2 pl-2 pr-3 text-gray-900 focus:outline-none"
+        />
+      </div>
+      <div class="relative shrink-0">
         <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">₱</span>
         <input
           v-model="priceInput"
@@ -208,7 +239,7 @@ const hasAnyPrice = computed(() => items.value.some((i) => i.price > 0))
       </div>
       <button
         type="submit"
-        class="rounded-lg bg-green-600 px-5 py-2 font-medium text-white hover:bg-green-700"
+        class="w-full rounded-lg bg-green-600 px-5 py-2 font-medium text-white hover:bg-green-700 sm:w-auto"
       >
         Add
       </button>
@@ -293,11 +324,13 @@ const hasAnyPrice = computed(() => items.value.some((i) => i.price > 0))
           >
             <div class="min-w-0">
               <span class="text-gray-700">{{ item.name }}</span>
-              <span v-if="item.brand || item.volume" class="block text-xs text-gray-400">
-                {{ [item.brand, item.volume].filter(Boolean).join(' · ') }}
+              <span v-if="item.brand || item.volume != null || item.quantity > 1" class="block text-xs text-gray-400">
+                {{ [item.brand, volumeDisplay(item), item.quantity > 1 ? `×${item.quantity}` : null].filter(Boolean).join(' · ') }}
               </span>
             </div>
-            <span v-if="item.price" class="shrink-0 text-gray-500">₱{{ item.price.toFixed(2) }}</span>
+            <span v-if="item.price" class="shrink-0 text-gray-500">
+              ₱{{ (item.price * (item.quantity ?? 1)).toFixed(2) }}
+            </span>
           </li>
           <li
             v-for="item in uncheckedItems"
@@ -306,11 +339,13 @@ const hasAnyPrice = computed(() => items.value.some((i) => i.price > 0))
           >
             <div class="min-w-0">
               <span>{{ item.name }}</span>
-              <span v-if="item.brand || item.volume" class="block text-xs text-gray-300">
-                {{ [item.brand, item.volume].filter(Boolean).join(' · ') }}
+              <span v-if="item.brand || item.volume != null || item.quantity > 1" class="block text-xs text-gray-300">
+                {{ [item.brand, volumeDisplay(item), item.quantity > 1 ? `×${item.quantity}` : null].filter(Boolean).join(' · ') }}
               </span>
             </div>
-            <span v-if="item.price" class="shrink-0">₱{{ item.price.toFixed(2) }}</span>
+            <span v-if="item.price" class="shrink-0">
+              ₱{{ (item.price * (item.quantity ?? 1)).toFixed(2) }}
+            </span>
           </li>
         </ul>
         <div v-if="checkedTotal > 0" class="mt-3 flex justify-between border-t border-gray-200 pt-3 font-medium">
