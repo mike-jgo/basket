@@ -1,6 +1,9 @@
 <script setup>
 defineProps(['item', 'requirePrice'])
 defineEmits(['toggle', 'remove', 'updatePrice'])
+
+const volumeDisplay = (item) =>
+  item.volume != null ? `${item.volume} ${item.volume_unit ?? ''}`.trim() : null
 </script>
 
 <template>
@@ -17,11 +20,11 @@ defineEmits(['toggle', 'remove', 'updatePrice'])
         {{ item.name }}
       </span>
       <span
-        v-if="item.brand || item.volume"
+        v-if="item.brand || item.volume != null || item.quantity > 1"
         class="block truncate text-xs"
         :class="item.checked ? 'text-gray-300' : 'text-gray-400'"
       >
-        {{ [item.brand, item.volume].filter(Boolean).join(' · ') }}
+        {{ [item.brand, volumeDisplay(item), item.quantity > 1 ? `×${item.quantity}` : null].filter(Boolean).join(' · ') }}
       </span>
     </div>
     <div class="relative">
